@@ -8,8 +8,8 @@
   - [**安装 Docker**](#安装-Docker)
   - [**安装 NVIDIA container toolkit**](#安装-NVIDIA-container-toolkit)
 - [**安装 MegaWise**](#安装-MegaWise)
-  - [**自动安装 MegaWise 并导入示例数据**](#自动安装-MegaWise-并导入示例数据)
-  - [**手动安装 MegaWise**](#手动安装-MegaWise)
+  - [**自动安装**](#自动安装-MegaWise-并导入示例数据)
+  - [**手动安装**](#手动安装-MegaWise)
 
 
 
@@ -20,7 +20,7 @@
 | 组件                     | 配置                    |
 |--------------------------|-------------------------|
 | GPU |  NVIDIA Pascal 或以上            |
-| CPU                 |Intel CPU Sandy Bridge 四核 1.8 GHz 或以上|
+| CPU                 |Intel CPU Sandy Bridge 或以上|
 | 内存         | 16 GB 或以上           |
 | 硬盘                  | 1 TB 或以上         |
 
