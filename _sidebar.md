@@ -13,4 +13,3 @@
        1. [训练营](https://github.com/Infini-Analytics/Bootcamp)
      * 发布说明
        1. [0.4.0](0.4.0_release_notes.md)
-

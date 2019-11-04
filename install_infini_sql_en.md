@@ -19,9 +19,10 @@ This document introduces how to install and configure MegaWise Docker.
 | Component                     | Configuration                   |
 |--------------------------|-------------------------|
 | GPU |  NVIDIA Pascal or higher            |
-| CPU                 |Intel CPU Sandy Bridge quad-core 1.8 GHz or higher|
+| CPU                 |Intel CPU Sandy Bridge or higher|
 | RAM         | 16 GB or higher           |
 | Hard disk                  | 1 TB or higher         |
+|  |   |
 
 ### Software requirements
 
@@ -32,6 +33,7 @@ This document introduces how to install and configure MegaWise Docker.
 | NVIDIA driver          | 410 or higher. The latest version is recommended.          |
 | Docker                   | 19.03 or higher         |
 | NVIDIA Container Toolkit |  1.0.5-1 or higher            |
+|  |   |
 
 ### Install NVIDIA driver
 
@@ -43,7 +45,7 @@ This document introduces how to install and configure MegaWise Docker.
    $ lsmod | grep nouveau  
    ```
 
-   If the terminal returns information about the Nouveau driver, you need to complete the following steps to disable the Nouveau driver:
+   If the command returns any information about the Nouveau driver, you need to complete the following steps to disable the Nouveau driver:
 
     1. Create the file `/etc/modprobe.d/blacklist-nouveau.conf` and add the following content:
 
@@ -119,6 +121,7 @@ This document introduces how to install and configure MegaWise Docker.
    | 28%   49C    P0    24W / 130W |   2731MiB /  5941MiB |      1%      Default |
    +-------------------------------+----------------------+----------------------+
    ```
+
 ### Install Docker
 
 1. Update the package lists.
@@ -131,19 +134,18 @@ This document introduces how to install and configure MegaWise Docker.
 
    ```bash
    $ sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-   Add Docker to your Apt repository.
    $ sudo add-apt-repository \
    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
    $(lsb_release -cs) \
    stable"
    ```
-
+   
    If curl is not installed, you need to install curl before running the previous command.
-
+   
    ```bash
    $ sudo apt-get install curl
    ```
-
+   
 3. Update the apt-get repository.
 
    ```bash
@@ -169,7 +171,7 @@ This document introduces how to install and configure MegaWise Docker.
    ```bash
    $ curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | \
    sudo apt-key add -
-   distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+   $ distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
    ```
 
 2. Update the package version to download.
@@ -203,9 +205,8 @@ If the terminal returns version information about the GPU, you can assume that t
 
 ## Automatically install MegaWise and import sample data
 
-1. Make sure you have read/write access to the `/tmp` directory.
 
-2. Download `install_megawise.sh` and `data_import.sh` to the same directory and make sure that you have execution access.
+1. Download `install_megawise.sh` and `data_import.sh` to the same directory and make sure that you have execution access.
 
    ```bash
    $ wget https://raw.githubusercontent.com/Infini-Analytics/infini/master/script/data_import.sh \
@@ -213,7 +214,7 @@ If the terminal returns version information about the GPU, you can assume that t
    $ chmod a+x *.sh
    ```
    
-3. Install MegaWise and import sample data.
+2. Install MegaWise and import sample data.
 
    ```bash
    $ ./install_megawise.sh [parameter 1，required] [parameter 2，optional]
@@ -276,36 +277,39 @@ If the terminal displays `Successfully installed MegaWise and imported test data
 
     ```bash
     $ cd $WORK_DIR/conf
-    $ wget https://raw.githubusercontent.com/Infini-Analytics/infini/master/config/db/chewie_main.yaml
-    $ wget https://raw.githubusercontent.com/Infini-Analytics/infini/master/config/db/etcd.yaml
-    $ wget https://raw.githubusercontent.com/Infini-Analytics/infini/master/config/db/megawise_config_template.yaml
-    $ wget https://raw.githubusercontent.com/Infini-Analytics/infini/master/config/db/render_engine.yaml
+    $ wget https://raw.githubusercontent.com/Infini-Analytics/infini/master/config/db/chewie_main.yaml \
+    https://raw.githubusercontent.com/Infini-Analytics/infini/master/config/db/etcd.yaml \
+    https://raw.githubusercontent.com/Infini-Analytics/infini/master/config/db/megawise_config_template.yaml \
+    https://raw.githubusercontent.com/Infini-Analytics/infini/master/config/db/render_engine.yaml
     ```
 
 6. Modify config files based on the hardware environment of MegaWise.
 
-   1. Open `chewie_main.yaml` in the `conf` directory and navigate to the following code:
+   1. Open `chewie_main.yaml` in the `conf` directory.
+   
+      1. Navigate to the following code:
 
-      ```yaml
-      cache:  # size in GB
-        cpu:
-            physical_memory: 16
-            partition_memory: 16
+          ```yaml
+          cache:  # size in GB
+            cpu:
+                physical_memory: 16
+                partition_memory: 16
+          
+            gpu:
+                gpu_num: 2
+                physical_memory: 2
+                partition_memory: 2
+          ```
+
+          Configure the parameters based on the hardware environment of the server (The numbers are in GBs).
+
+          For the `cpu` part, `physical_memory` and `partition_memory` respectively represents the available memory size for MegaWise and the memory size for the data cache partition. It is recommended that you set both `partition_memory` and `physical_memory` to more than 70 percent of the server memory.
       
-        gpu:
-            gpu_num: 2
-            physical_memory: 2
-            partition_memory: 2
-      ```
+          For the `gpu` part, `gpu_num` represents the number of GPUs used by MegaWise. `physical_memory` and `partition_memory` respectively represents the available video memory size for MegaWise and the video memory size for the data cache partition. It is recommended that you reserve 2 GB of video memory to store the intermediate results during computation by setting `partition_memory` and `physical_memory` to a value that equals the video memory of a single GPU minus 2.
 
-      Configure the parameters based on the hardware environment of the server (The numbers are in GBs).
-
-      For the `cpu` part, `physical_memory` and `partition_memory` respectively represents the available memory size for MegaWise and the memory size for the data cache partition. It is recommended that you set both `partition_memory` and `physical_memory` to more than 70 percent of the server memory.
-    
-      For the `gpu` part, `gpu_num` represents the number of GPUs used by MegaWise. `physical_memory` and `partition_memory` respectively represents the available video memory size for MegaWise and the video memory size for the data cache partition. It is recommended that you reserve 2 GB of video memory to store the intermediate results during computation by setting `partition_memory` and `physical_memory` to a value that equals the video memory of a single GPU minus 2.
    
     2. Open `megawise_config_template.yaml` in the `conf` directory.
-    
+   
         1. Navigate to the following code and set parameter values:
 
             ```yaml
@@ -324,7 +328,7 @@ If the terminal displays `Successfully installed MegaWise and imported test data
                     physical_memory: 2    # unit: GB
                     partition_memory: 2   # unit: GB
                 cuda_profile_query_cnt: -1 #-1 means don't profile, positive integer means the number of queries to profile, other value invalid
-            ```  
+            ```
 
             Set the values of some parameters per the following table:
 
@@ -358,13 +362,13 @@ If the terminal displays `Successfully installed MegaWise and imported test data
 7. Run MegaWise.
 
     ```bash
-    sudo docker run --gpus all --shm-size 17179869184 \ 
-                            -v $WORK_DIR/conf:/megawise/conf \ 
-                            -v $WORK_DIR/data:/megawise/data \ 
-                            -v $WORK_DIR/server_data:/megawise/server_data \ 
-                            -v /tmp:/tmp \ 
-                            -v /home/$USER/.nv:/home/megawise/.nv
-                            -p 5433:5432 \ 
+    sudo docker run --gpus all --shm-size 17179869184 \
+                            -v $WORK_DIR/conf:/megawise/conf \
+                            -v $WORK_DIR/data:/megawise/data \
+                            -v $WORK_DIR/server_data:/megawise/server_data \
+                            -v /tmp:/tmp \
+                            -v /home/$USER/.nv:/home/megawise/.nv \
+                            -p 5433:5432 \
                             $IMAGE_ID
     ```
 
